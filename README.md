@@ -160,12 +160,7 @@ rm/
 
 ## Running the Application
 
-The project includes a convenient startup script (`run.sh`) that:
-
-1. Builds the backend using Maven
-2. Installs frontend dependencies if needed
-3. Starts the Spring Boot backend
-4. Starts the React frontend development server
+The project includes convenient startup scripts for both Unix-like systems (Linux, macOS) and Windows:
 
 ### Prerequisites
 
@@ -173,15 +168,29 @@ The project includes a convenient startup script (`run.sh`) that:
 - Node.js and npm
 - Maven (wrapper included)
 
-### Starting the Application
+### Starting the Application on Linux/macOS
 
 ```bash
 ./run.sh
 ```
 
+### Starting the Application on Windows
+
+```cmd
+run.bat
+```
+
+Either script will:
+1. Build the backend using Maven
+2. Install frontend dependencies if needed
+3. Start the Spring Boot backend
+4. Start the React frontend development server
+
 This will start:
 - Backend server at http://localhost:8080
 - Frontend development server at http://localhost:3000
+
+**Note for Windows users**: The applications will run in separate windows. Close those windows to stop the application when done.
 
 ## Development
 
