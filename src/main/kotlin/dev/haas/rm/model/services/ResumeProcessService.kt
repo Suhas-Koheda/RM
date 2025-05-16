@@ -1,5 +1,7 @@
-package dev.haas.rm.model
+package dev.haas.rm.model.services
 
+import dev.haas.rm.model.AnalysedResults
+import dev.haas.rm.model.UploadRequest
 import dev.langchain4j.agent.tool.P
 import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.model.chat.ChatModel
@@ -25,14 +27,14 @@ class ResumeProcessService(private val fileProcessService: FileProcessService, p
             
             Check if the resume is a match for the job description. Return:
             1. A match percentage (0-100)
-            2.The suggestion shoud be given in 10 points  Suggestions for improving the resume and the suggestions should not be looking like ai generated you must humanise it . Headings of suggestions should be wrapped with h3 html tag and the remaining text in h5 html tag  
+            2.The suggestion should be given in 10 points  Suggestions for improving the resume and the suggestions should not be looking like ai generated you must humanise it . Headings of suggestions should be wrapped with h3 html tag and the remaining text in h5 html tag  
             3. The model used for analysis
             
             Format your response exactly like this: [match percentage]|[suggestions]|[model name / which model are you ]
             Dont give the default model in the model name give which model are you in place of the model
             For example: 85.0|Add more leadership experience|gpt-4
         """.trimIndent()
-        
+
         return buildAnalysedResults(chatModel.chat(analyseTemplate))
     }
 

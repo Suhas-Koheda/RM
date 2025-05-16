@@ -1,5 +1,7 @@
 package dev.haas.rm.model
 
+import dev.haas.rm.model.services.FileProcessService
+import dev.haas.rm.model.services.ResumeProcessService
 import dev.langchain4j.model.chat.ChatModel
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue

@@ -1,5 +1,6 @@
 package dev.haas.rm.model
 
+import dev.haas.rm.model.services.FileProcessService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.core.io.ClassPathResource

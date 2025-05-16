@@ -1,7 +1,7 @@
 package dev.haas.rm.controller
 
 import dev.haas.rm.model.AnalysedResults
-import dev.haas.rm.model.ResumeProcessService
+import dev.haas.rm.model.services.ResumeProcessService
 import dev.haas.rm.model.UploadRequest
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
