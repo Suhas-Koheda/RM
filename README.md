@@ -204,6 +204,23 @@ This will start:
 - Enhanced AI suggestions
 - Custom resume templates
 
+## Known Issues and Troubleshooting
+
+### Match Percentage Display Issue
+
+**Issue**: The match percentage may display incorrectly (e.g., showing 7800% instead of 78%).
+
+**Cause**: There's a mismatch in how the match percentage is handled between the backend and frontend:
+- The backend (`ResumeProcessService.kt`) returns the match percentage as a value between 0-100 (e.g., 78.0)
+- The Material UI `LinearProgress` component expects values in the same range (0-100)
+- No conversion is needed, but if the backend returns the value in a different format, display issues occur
+
+**Solution**: Ensure that the match percentage is not converted again in the frontend. In `ResultsPage.js`, make sure:
+- The match value from the backend is used directly: `const matchPercentage = match;`
+- No multiplication by 100 is performed on the match percentage value
+
+If the issue persists, check the actual value being received from the backend using the browser's developer tools (Network tab) to examine the API response.
+
 ## Contributors
 
 - Original development by [Your Name]
