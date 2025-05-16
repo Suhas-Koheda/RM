@@ -38,6 +38,7 @@
   },
   "proxy": "http://localhost:8080",
   "devDependencies": {
+    "eslint-plugin-jest": "^25.7.0",
     "react-scripts": "^5.0.1"
   }
 }
