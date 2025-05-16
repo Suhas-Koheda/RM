@@ -25,7 +25,7 @@ function ResultsPage() {
   }
 
   const { match, suggestions, modelUsed } = result;
-  const matchPercentage = Math.round(match * 100);
+  const matchPercentage = match;
   
   // Determine color based on match percentage
   const getMatchColor = (percentage) => {

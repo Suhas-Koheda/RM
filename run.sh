@@ -47,7 +47,7 @@ command_exists npm || error_exit "npm is not installed. Please install npm."
 echo -e "\n[1/4] Building backend..."
 # Navigate to backend directory and build with Maven wrapper
 cd "$BACKEND_DIR" || error_exit "Cannot navigate to backend directory"
-use_maven_wrapper clean package -DskipTests || error_exit "Backend build failed"
+use_maven_wrapper package -DskipTests || error_exit "Backend build failed"
 echo "Backend build successful!"
 
 echo -e "\n[2/4] Installing frontend dependencies if needed..."
