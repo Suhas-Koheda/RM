@@ -27,6 +27,12 @@ function ResultsPage() {
   const { match, suggestions, modelUsed } = result;
   const matchPercentage = match;
   
+  // Process suggestions to remove markdown code fences
+  const processedSuggestions = suggestions ? suggestions
+    .replace(/^```html\s*/i, '') // Remove opening ```html
+    .replace(/\s*```\s*$/i, '')  // Remove closing ```
+    : '';
+  
   // Determine color based on match percentage
   const getMatchColor = (percentage) => {
     if (percentage >= 80) return 'success.main';
@@ -98,9 +104,25 @@ function ResultsPage() {
             <Typography variant="h6" gutterBottom>
               Suggestions to Improve Your Match
             </Typography>
-            <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
-              {suggestions}
-            </Typography>
+            <Box 
+              sx={{ 
+                '& h3': { 
+                  fontSize: '1.15rem',
+                  fontWeight: 'bold',
+                  marginTop: '16px',
+                  marginBottom: '8px',
+                  color: 'text.primary'
+                },
+                '& h5': {
+                  fontSize: '0.95rem',
+                  fontWeight: 'normal',
+                  marginTop: '4px',
+                  marginBottom: '8px',
+                  color: 'text.secondary'
+                }
+              }}
+              dangerouslySetInnerHTML={{ __html: processedSuggestions }}
+            />
           </CardContent>
         </Card>
 
