@@ -63,7 +63,7 @@ class ResumeProcessServiceTest {
         
         // When
         val analysed = resumeProcessService.buildAnalysedResults(resultString)
-        
+        println(analysed)
         // Then
         assertTrue(analysed.match == 85.0)
         assertTrue(analysed.suggestions == "Add more leadership experience")
@@ -91,7 +91,9 @@ class ResumeProcessServiceTest {
         assertTrue(result.match >= 0.0)
         assertNotNull(result.suggestions)
         assertNotNull(result.modelUsed)
-        
+
+        println("resulkts :$result")
+
         // Print results for verification
         println("Match percentage: ${result.match}%")
         println("Suggestions: ${result.suggestions}")

@@ -79,11 +79,24 @@
 			<artifactId>langchain4j-google-ai-gemini-spring-boot-starter</artifactId>
 			<version>1.0.0-beta5</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/dev.langchain4j/langchain4j -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.mockito.kotlin</groupId>
 			<artifactId>mockito-kotlin</artifactId>
 			<version>5.2.1</version>
 			<scope>test</scope>
+		</dependency>
+		<!-- Add PDFBox for PDF processing -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.30</version>
 		</dependency>
 	</dependencies>
 
@@ -125,5 +138,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
