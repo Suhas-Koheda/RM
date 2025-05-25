@@ -1,5 +1,21 @@
 package dev.haas.rm.model
 
-import org.springframework.context.annotation.Bean
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Column
 
-data class AnalysedResults(val match: Double,val suggestions:String,val modelUsed: String)
+@Entity
+data class AnalysedResults(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
+    
+    val match: Double,
+    
+    @Column(columnDefinition = "TEXT")
+    val suggestions: String,
+    
+    val modelUsed: String
+)
