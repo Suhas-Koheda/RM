@@ -31,7 +31,7 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
             
             Check if the resume is a match for the job description. Return:
             1. A match percentage (0-100)
-             2. Provide exactly 10 brief and focused suggestions for improving the resume. Each suggestion should:
+            2. Provide exactly 10 brief and focused suggestions for improving the resume. Each suggestion should:
                - Be specific and actionable
                - Focus on one aspect of improvement
                - Be 1-2 sentences long
@@ -41,13 +41,10 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
             
             Format your response exactly like this:
             [match percentage]|<h3>Suggestion 1</h3><h5>Details 1</h5><h3>Suggestion 2</h3><h5>Details 2</h5>...|[model name]
-            
-            Example format:
-            85.0|<h3>Highlight Technical Skills</h3><h5>Move your technical skills section to the top.</h5><h3>Add Project Metrics</h3><h5>Include quantifiable results for your projects.</h5>|Gemini Pro
         """.trimIndent()
 
         return buildAnalysedResults(chatModel.chat(analyseTemplate)).also {
-            neonRepository.save<NeonModel>(NeonModel(resume=resume, analysedResults = it, userID = 1))
+            neonRepository.save(NeonModel(resume=resume, analysedResults = it, userID = 1))
         }
     }
 
@@ -57,34 +54,15 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
         val splitResults = results.split("|")
         return try {
             println(splitResults)
-            val suggestions = splitResults[1].trim().split("<h3>")
-                .filter { it.isNotEmpty() }
-                .map { it.replace("</h3>", "").replace("</h5>", "").trim() }
-                .take(10)
-                .toMutableList()
-
-            while (suggestions.size < 10) {
-                suggestions.add("")
-            }
-            
             AnalysedResults(
                 match = splitResults[0].trim().toDouble(),
-                suggestion1 = suggestions[0],
-                suggestion2 = suggestions[1],
-                suggestion3 = suggestions[2],
-                suggestion4 = suggestions[3],
-                suggestion5 = suggestions[4],
-                suggestion6 = suggestions[5],
-                suggestion7 = suggestions[6],
-                suggestion8 = suggestions[7],
-                suggestion9 = suggestions[8],
-                suggestion10 = suggestions[9],
+                suggestions = splitResults[1].trim(),
                 modelUsed = splitResults[2].trim()
             )
         } catch (e: Exception) {
             AnalysedResults(
                 match = 0.0,
-                suggestion1 = "Error parsing response: ${e.message}. Original response: $results",
+                suggestions = "Error parsing response: ${e.message}. Original response: $results",
                 modelUsed = "unknown"
             )
         }

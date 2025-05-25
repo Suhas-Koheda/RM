@@ -15,34 +15,7 @@ data class AnalysedResults(
     val match: Double,
     
     @Column(columnDefinition = "TEXT")
-    val suggestion1: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion2: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion3: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion4: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion5: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion6: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion7: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion8: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion9: String = "",
-    
-    @Column(columnDefinition = "TEXT")
-    val suggestion10: String = "",
+    val suggestions: String = "",
     
     val modelUsed: String
 )
