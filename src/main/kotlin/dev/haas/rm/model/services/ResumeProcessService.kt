@@ -30,7 +30,7 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
             $JD
             
             Check if the resume is a match for the job description. Return:
-            1. A match percentage (0-100)
+            1. A match percentage (0-100) without % symbol only the integer value
             2. Provide exactly 10 brief and focused suggestions for improving the resume. Each suggestion should:
                - Be specific and actionable
                - Focus on one aspect of improvement
@@ -50,7 +50,7 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
 
     @Tool("The analysed results are given into a class AnalysedResults ")
     fun buildAnalysedResults(
-        @P("the analysed string in the format matched or not | suggestions | modelUsed") results: String): AnalysedResults {
+        @P("the analysed string in the format -> matched or not | suggestions | modelUsed") results: String): AnalysedResults {
         val splitResults = results.split("|")
         return try {
             println(splitResults)
