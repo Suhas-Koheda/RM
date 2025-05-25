@@ -1,14 +1,18 @@
 package dev.haas.rm.model.services
 
 import dev.haas.rm.model.AnalysedResults
+import dev.haas.rm.model.NeonModel
 import dev.haas.rm.model.UploadRequest
+import dev.haas.rm.model.repository.NeonRepository
 import dev.langchain4j.agent.tool.P
 import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.model.chat.ChatModel
 import org.springframework.stereotype.Service
 
 @Service
-class ResumeProcessService(private val fileProcessService: FileProcessService, private val chatModel: ChatModel) {
+class ResumeProcessService(private val fileProcessService: FileProcessService,
+                           private val chatModel: ChatModel,
+                            private val neonRepository: NeonRepository) {
 
     fun processUploadRequest(uploadRequest: UploadRequest): AnalysedResults {
         val fileData = fileProcessService.processFile(uploadRequest.resumeFile)
@@ -27,15 +31,24 @@ class ResumeProcessService(private val fileProcessService: FileProcessService, p
             
             Check if the resume is a match for the job description. Return:
             1. A match percentage (0-100)
-            2.The suggestion should be given in 10 points  Suggestions for improving the resume and the suggestions should not be looking like ai generated you must humanise it . Headings of suggestions should be wrapped with h3 html tag and the remaining text in h5 html tag  
-            3. The model used for analysis
+             2. Provide exactly 10 brief and focused suggestions for improving the resume. Each suggestion should:
+               - Be specific and actionable
+               - Focus on one aspect of improvement
+               - Be 1-2 sentences long
+               - Start with a clear action verb
+               - Be wrapped in <h3> for the title and <h5> for the details
+            3. The model used for analysis (your specific model name)
             
-            Format your response exactly like this: [match percentage]|[suggestions]|[model name / which model are you ]
-            Dont give the default model in the model name give which model are you in place of the model
-            For example: 85.0|Add more leadership experience|gpt-4
+            Format your response exactly like this:
+            [match percentage]|<h3>Suggestion 1</h3><h5>Details 1</h5><h3>Suggestion 2</h3><h5>Details 2</h5>...|[model name]
+            
+            Example format:
+            85.0|<h3>Highlight Technical Skills</h3><h5>Move your technical skills section to the top.</h5><h3>Add Project Metrics</h3><h5>Include quantifiable results for your projects.</h5>|Gemini Pro
         """.trimIndent()
 
-        return buildAnalysedResults(chatModel.chat(analyseTemplate))
+        return buildAnalysedResults(chatModel.chat(analyseTemplate)).also {
+            neonRepository.save<NeonModel>(NeonModel(resume=resume, analysedResults = it, userID = 1))
+        }
     }
 
     @Tool("The analysed results are given into a class AnalysedResults ")
@@ -44,15 +57,34 @@ class ResumeProcessService(private val fileProcessService: FileProcessService, p
         val splitResults = results.split("|")
         return try {
             println(splitResults)
+            val suggestions = splitResults[1].trim().split("<h3>")
+                .filter { it.isNotEmpty() }
+                .map { it.replace("</h3>", "").replace("</h5>", "").trim() }
+                .take(10)
+                .toMutableList()
+
+            while (suggestions.size < 10) {
+                suggestions.add("")
+            }
+            
             AnalysedResults(
                 match = splitResults[0].trim().toDouble(),
-                suggestions = splitResults[1].trim(),
+                suggestion1 = suggestions[0],
+                suggestion2 = suggestions[1],
+                suggestion3 = suggestions[2],
+                suggestion4 = suggestions[3],
+                suggestion5 = suggestions[4],
+                suggestion6 = suggestions[5],
+                suggestion7 = suggestions[6],
+                suggestion8 = suggestions[7],
+                suggestion9 = suggestions[8],
+                suggestion10 = suggestions[9],
                 modelUsed = splitResults[2].trim()
             )
         } catch (e: Exception) {
             AnalysedResults(
                 match = 0.0,
-                suggestions = "Error parsing response: ${e.message}. Original response: $results",
+                suggestion1 = "Error parsing response: ${e.message}. Original response: $results",
                 modelUsed = "unknown"
             )
         }
