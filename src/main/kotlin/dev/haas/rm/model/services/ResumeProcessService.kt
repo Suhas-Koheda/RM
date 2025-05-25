@@ -1,54 +1,142 @@
 package dev.haas.rm.model.services
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import dev.haas.rm.model.AnalysedResults
 import dev.haas.rm.model.UploadRequest
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
 import org.springframework.stereotype.Service
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
 
-private data class OllamaRequest(val model: String, val prompt: String, val stream: Boolean = false)
-private data class OllamaResponse(@JsonProperty("response") val response: String)
+data class OllamaRequest(val model: String, val prompt: String, val stream: Boolean = false)
+data class OllamaResponse(@JsonProperty("response") val response: String)
 
 @Service
 class ResumeProcessService(
-    private val fileProcessService: FileProcessService,
-    private val httpClient: HttpClient
+    private val fileProcessService: FileProcessService
 ) {
-
-    suspend fun processUploadRequest(uploadRequest: UploadRequest): String {
-        val fileData = fileProcessService.processFile(uploadRequest.resumeFile)
-        return analyseResume(fileData, uploadRequest.JD)
+    private val httpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(30))
+        .build()
+    
+    private val objectMapper = ObjectMapper().apply {
+        registerKotlinModule()
     }
 
-    suspend fun analyseResume(resume: String, JD: String): String {
+    fun processUploadRequest(uploadRequest: UploadRequest): AnalysedResults {
+        println("processUploadRequest called with model: ${uploadRequest.model}")
+        val fileData = fileProcessService.processFile(uploadRequest.resumeFile)
+        return analyseResume(fileData, uploadRequest.JD, uploadRequest.model)
+    }
+
+    fun analyseResume(resume: String, JD: String, model: String? = null): AnalysedResults {
+        println("analyseResume called with model: $model")
+        
         val analyseTemplate = """
-            I need you to analyze a resume against a job description.
-            First you need to check if the resume is written using AI 
+            System: You are a professional recruiter with 20+ years of experience in HR...
             Resume:
             $resume
             
             Job Description:
             $JD
             
-            Check if the resume is a match for the job description. Return:
-            1. A match percentage (0-100)
-            2.The suggestion should be given in 10 points  Suggestions for improving the resume and the suggestions should not be looking like ai generated you must humanise it . Headings of suggestions should be wrapped with h3 html tag and the remaining text in h5 html tag  
-            3. The model used for analysis
-            
-            Format your response exactly like this: [match percentage]|[suggestions]|[model name / which model are you ]
-            Dont give the default model in the model name give which model are you in place of the model
-            For example: 85.0|Add more leadership experience|gpt-4
+            Your task:
+            1. Analyze how well the resume matches the job description
+            2. Calculate a match percentage between 0 and 100
+            3. Provide exactly 10 specific suggestions to improve the resume
+
+            EXTREMELY IMPORTANT - FORMAT INSTRUCTIONS:
+            - First: Just the match percentage number (example: 75.0)
+            - Second: The pipe character |
+            - Third: 10 suggestions formatted with HTML tags
+            - Fourth: Another pipe character |
+            - Fifth: The text "deepseek-llm"
         """.trimIndent()
 
-        val requestPayload = OllamaRequest(model = "llama2", prompt = analyseTemplate)
+        var attempts = 0
+        var response: String = ""
+        var formattedResponse: String? = null
 
-        val response: OllamaResponse = httpClient.post("http://localhost:11434/api/generate") {
-            contentType(ContentType.Application.Json)
-            setBody(requestPayload)
-        }.body()
+        while (attempts < 3) {
+            attempts++
+            println("Attempt $attempts to get formatted response")
 
-        return response.response
+            try {
+                val modelToUse = model ?: "qwen3:0.6b"
+                println("Using model: $modelToUse")
+                
+                val requestPayload = OllamaRequest(
+                    model = modelToUse,
+                    prompt = analyseTemplate,
+                    stream = false
+                )
+                
+                println("Request payload model: ${requestPayload.model}")
+                
+                println("Request payload model: ${requestPayload.model}")
+
+                val request = HttpRequest.newBuilder()
+                    .uri(URI("http://localhost:11434/api/generate"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(requestPayload)))
+                    .build()
+
+                val httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+                response = objectMapper.readValue(httpResponse.body(), OllamaResponse::class.java).response
+
+                if (response.count { it == '|' } >= 2 && response.matches(Regex(".*\\d+.*\\|.*\\|.*"))) {
+                    formattedResponse = response
+                    break
+                }
+
+                if (!response.contains("|")) {
+                    val matchResult = Regex("(\\d+(\\.\\d+)?)").find(response)
+                    if (matchResult != null) {
+                        val matchPercentage = matchResult.groupValues[1]
+                        formattedResponse = "$matchPercentage|$response|${model ?: "qwen3:0.6b"}"
+                        break
+                    }
+                }
+
+                Thread.sleep(1000)
+            } catch (e: Exception) {
+                println("Error during attempt $attempts: ${e.message}")
+                Thread.sleep(1000)
+            }
+        }
+
+        if (formattedResponse == null) {
+            return AnalysedResults(
+                match = 0.0,
+                suggestions = "Failed to get properly formatted response after $attempts attempts. Raw response: $response",
+                modelUsed = "unknown"
+            )
+        }
+
+        return buildAnalysedResults(formattedResponse)
+    }
+
+    fun buildAnalysedResults(results: String): AnalysedResults {
+        println("Raw response from model: $results \n")
+        val splitResults = results.split("|")
+        return try {
+            val result = AnalysedResults(
+                match = splitResults[0].trim().toDouble(),
+                suggestions = splitResults[1].trim(),
+                modelUsed = splitResults[2].trim()
+            )
+            println("Created AnalysedResults with modelUsed: ${result.modelUsed}")
+            result
+        } catch (e: Exception) {
+            AnalysedResults(
+                match = 0.0,
+                suggestions = "Error parsing response: ${e.message}. Original response: $results",
+                modelUsed = "unknown"
+            )
+        }
     }
 }

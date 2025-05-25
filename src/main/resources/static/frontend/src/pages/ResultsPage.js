@@ -97,6 +97,9 @@ function ResultsPage() {
               {matchPercentage}%
             </Typography>
           </Box>
+          <Typography variant="caption" color="text.secondary">
+            Analysis performed using <strong>{modelUsed}</strong> model
+          </Typography>
         </Box>
 
         <Card variant="outlined" sx={{ mb: 4 }}>

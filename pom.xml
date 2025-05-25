@@ -11,7 +11,7 @@
 	<groupId>dev.haas</groupId>
 	<artifactId>rm</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>rm</name>
+	<name>Resume ATS</name>
 	<description>Resume ATS built using Langchain4J and SpringBoot</description>
 	<url/>
 	<licenses>
@@ -27,8 +27,8 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>21</java.version>
-		<kotlin.version>1.9.25</kotlin.version>
+		<java.version>17</java.version>
+		<kotlin.version>1.8.22</kotlin.version>
 	</properties>
 	<dependencies>
 <!--		<dependency>-->
@@ -42,6 +42,17 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-kotlin</artifactId>
+		</dependency>
+		 <!-- Kotlinx coroutines dependencies -->
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-core</artifactId>
+			<version>1.7.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-reactor</artifactId>
+			<version>1.7.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
@@ -80,12 +91,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>io.ktor</groupId>
-			<artifactId>ktor-client-mock</artifactId>
-			<version>3.1.3</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jetbrains.kotlinx</groupId>
 			<artifactId>kotlinx-coroutines-test</artifactId>
 			<version>1.7.3</version>
@@ -109,25 +114,49 @@
 			<artifactId>pdfbox</artifactId>
 			<version>2.0.30</version>
 		</dependency>
+		 <!-- Remove these Ktor dependencies -->
+		<!--
 		<dependency>
 			<groupId>io.ktor</groupId>
-			<artifactId>ktor-client-core</artifactId>
-			<version>3.1.3</version>
+			<artifactId>ktor-client-mock</artifactId>
+			<version>2.3.7</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.ktor</groupId>
-			<artifactId>ktor-client-cio</artifactId>
-			<version>3.1.3</version>
+			<artifactId>ktor-client-core-jvm</artifactId>
+			<version>2.3.7</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ktor</groupId>
+			<artifactId>ktor-client-cio-jvm</artifactId>
+			<version>2.3.7</version>
 		</dependency>
 		<dependency>
 			<groupId>io.ktor</groupId>
 			<artifactId>ktor-client-content-negotiation</artifactId>
-			<version>3.1.3</version>
+			<version>2.3.7</version>
 		</dependency>
 		<dependency>
 			<groupId>io.ktor</groupId>
-			<artifactId>ktor-serialization-jackson</artifactId>
-			<version>3.1.3</version>
+			<artifactId>ktor-serialization-jackson-jvm</artifactId>
+			<version>2.3.7</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ktor</groupId>
+			<artifactId>ktor-serialization-kotlinx-json-jvm</artifactId>
+			<version>2.3.7</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ktor</groupId>
+			<artifactId>ktor-client-logging-jvm</artifactId>
+			<version>2.3.7</version>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-serialization-json</artifactId>
+			<version>1.5.1</version>
 		</dependency>
 	</dependencies>
 

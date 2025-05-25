@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Container, 
@@ -8,11 +8,19 @@ import {
   TextField, 
   Box, 
   CircularProgress,
-  Alert 
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  Tooltip,
+  IconButton
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { styled } from '@mui/material/styles';
-import { analyzeResume } from '../services/api';
+import { analyzeResume, fetchAvailableModels } from '../services/api';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -33,6 +41,35 @@ function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fileName, setFileName] = useState('No file selected');
+  const [models, setModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState('');
+  const [loadingModels, setLoadingModels] = useState(false);
+
+  // Function to fetch available models
+  const fetchModels = async () => {
+    setLoadingModels(true);
+    try {
+      const modelsData = await fetchAvailableModels();
+      setModels(modelsData);
+      if (modelsData && modelsData.length > 0) {
+        // If user hasn't selected a model yet or their selected model isn't available,
+        // default to the first available model
+        if (!selectedModel || !modelsData.find(model => model.name === selectedModel)) {
+          setSelectedModel(modelsData[0].name);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch models:', error);
+      setError('Failed to fetch available models.');
+    } finally {
+      setLoadingModels(false);
+    }
+  };
+
+  // Fetch available models when component mounts
+  useEffect(() => {
+    fetchModels();
+  }, []);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -54,6 +91,10 @@ function HomePage() {
     setJobDescription(event.target.value);
   };
 
+  const handleModelChange = (event) => {
+    setSelectedModel(event.target.value);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!file) {
@@ -64,14 +105,24 @@ function HomePage() {
       setError('Please enter a job description');
       return;
     }
+    if (!selectedModel) {
+      setError('Please select an AI model');
+      return;
+    }
 
     try {
       setLoading(true);
-      const result = await analyzeResume(file, jobDescription);
+      setError('');
+      console.log('Submitting with model:', selectedModel);
+      const result = await analyzeResume(file, jobDescription, selectedModel);
       navigate('/results', { state: { result, jobDescription, fileName: file.name } });
     } catch (error) {
-      setError('Failed to analyze resume. Please try again.');
-      console.error(error);
+      console.error('Error analyzing resume:', error);
+      if (error.response && error.response.status === 500) {
+        setError('Server error. The Ollama server might be unreachable. Please try again later.');
+      } else {
+        setError('Failed to analyze resume. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -95,21 +146,26 @@ function HomePage() {
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Box sx={{ mb: 3 }}>
-            <Button
-              component="label"
-              variant="contained"
-              startIcon={<CloudUploadIcon />}
-              sx={{ mb: 1 }}
-            >
-              Upload Resume
-              <VisuallyHiddenInput type="file" onChange={handleFileChange} />
-            </Button>
-            <Typography variant="body2" sx={{ ml: 1, display: 'inline' }}>
-              {fileName}
-            </Typography>
-            <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-              Accepted formats: PDF, txt
-            </Typography>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item>
+                <Button
+                  component="label"
+                  variant="contained"
+                  startIcon={<CloudUploadIcon />}
+                >
+                  Upload Resume
+                  <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+                </Button>
+              </Grid>
+              <Grid item xs>
+                <Typography variant="body2">
+                  {fileName}
+                </Typography>
+                <Typography variant="caption" display="block">
+                  Accepted formats: PDF, txt
+                </Typography>
+              </Grid>
+            </Grid>
           </Box>
 
           <TextField
@@ -122,13 +178,55 @@ function HomePage() {
             sx={{ mb: 3 }}
             placeholder="Paste the job description here..."
           />
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel id="model-select-label">AI Model</InputLabel>
+              <Select
+                labelId="model-select-label"
+                id="model-select"
+                value={selectedModel}
+                onChange={handleModelChange}
+                label="AI Model"
+                disabled={loadingModels || models.length === 0}
+              >
+                {loadingModels ? (
+                  <MenuItem value="">
+                    <em>Loading models...</em>
+                  </MenuItem>
+                ) : (
+                  models.map((model) => (
+                    <MenuItem key={model.name} value={model.name}>
+                      {model.displayName || model.name} 
+                      {model.family && model.parameterSize && ` (${model.family} - ${model.parameterSize})`}
+                    </MenuItem>
+                  ))
+                )}
+                {!loadingModels && models.length === 0 && (
+                  <MenuItem value="">
+                    <em>No models available</em>
+                  </MenuItem>
+                )}
+              </Select>
+            </FormControl>
+            <Tooltip title="Refresh available models">
+              <IconButton 
+                color="primary" 
+                onClick={fetchModels} 
+                disabled={loadingModels}
+                sx={{ ml: 1 }}
+              >
+                {loadingModels ? <CircularProgress size={24} /> : <RefreshIcon />}
+              </IconButton>
+            </Tooltip>
+          </Box>
 
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            disabled={loading}
+            disabled={loading || !selectedModel}
             sx={{ py: 1.5 }}
           >
             {loading ? (
