@@ -45,11 +45,20 @@ The application consists of:
 #### Controllers
 - `FileUploadController`: Handles file uploads and processes analysis requests
 
-#### Models
-- `AnalysedResults`: Data class for storing analysis results (match percentage, suggestions, model used)
+#### Services
 - `FileProcessService`: Service for processing and extracting text from uploaded files
 - `ResumeProcessService`: Service for analyzing resume text against job descriptions using AI
-- `UploadRequest`: Data class for handling the uploaded resume and job description
+- `NeonServices`: Service for database operations
+
+#### Repository
+- `NeonRepository`: Interface for database access
+
+#### Models
+- Entity
+  - `AnalysedResults`: Data class for storing analysis results (match percentage, suggestions, model used)
+  - `NeonModel`: Entity model for database operations
+- DTO
+  - `UploadRequest`: Data class for handling the uploaded resume and job description
 
 ### Frontend Components
 
@@ -86,14 +95,21 @@ rm/
 │   ├── main/
 │   │   ├── kotlin/
 │   │   │   └── dev/haas/rm/
-│   │   │       ├── controller/
+│   │   │       ├── controller/       # @RestController classes
 │   │   │       │   └── FileUploadController.kt
-│   │   │       ├── model/
-│   │   │       │   ├── AnalysedResults.kt
+│   │   │       ├── service/          # Business logic
 │   │   │       │   ├── FileProcessService.kt
-│   │   │       │   ├── FirebaseModel.kt
 │   │   │       │   ├── ResumeProcessService.kt
-│   │   │       │   └── UploadRequest.kt
+│   │   │       │   └── NeonServices.kt
+│   │   │       ├── repository/       # Database access (Spring Data JPA)
+│   │   │       │   └── NeonRepository.kt
+│   │   │       ├── model/            # Data classes
+│   │   │       │   ├── entity/       # JPA entities
+│   │   │       │   │   ├── NeonModel.kt
+│   │   │       │   │   └── AnalysedResults.kt
+│   │   │       │   └── dto/          # Request/Response objects
+│   │   │       │       └── UploadRequest.kt
+│   │   │       ├── config/           # Configuration classes
 │   │   │       └── RmApplication.kt
 │   │   └── resources/
 │   │       ├── static/
@@ -101,8 +117,13 @@ rm/
 │   │       │   │   ├── public/
 │   │       │   │   └── src/
 │   │       │   │       ├── components/
+│   │       │   │       │   ├── Header.js
+│   │       │   │       │   └── Footer.js
 │   │       │   │       ├── pages/
+│   │       │   │       │   ├── HomePage.js
+│   │       │   │       │   └── ResultsPage.js
 │   │       │   │       └── services/
+│   │       │   │           └── api.js
 │   │       │   └── Suhas_Koheda_Kotlin_Resume.pdf
 │   │       └── application.properties
 │   └── test/
@@ -110,12 +131,13 @@ rm/
 │           └── dev/haas/rm/
 │               ├── controller/
 │               │   └── FileUploadControllerTest.kt
-│               ├── model/
+│               ├── service/
 │               │   ├── FileProcessServiceTest.kt
 │               │   └── ResumeProcessServiceTest.kt
 │               └── RmApplicationTests.kt
 ├── pom.xml
 ├── run.sh
+├── run.bat
 └── README.md
 ```
 
@@ -146,10 +168,12 @@ rm/
 
 ### Backend
 
-- `processFile(resume: MultipartFile)`: Extracts text from uploaded resume files
-- `processUploadRequest(uploadRequest: UploadRequest)`: Processes the uploaded resume and job description
-- `analyseResume(resume: String, JD: String)`: Uses AI to analyze the resume against the job description
-- `buildAnalysedResults(results: String)`: Parses AI response into structured result data
+#### Service Layer
+- `FileProcessService.processFile(resume: MultipartFile)`: Extracts text from uploaded resume files
+- `FileUploadController.processUploadRequest(uploadRequest: UploadRequest)`: Processes the uploaded resume and job description
+- `ResumeProcessService.analyseResume(resume: String, JD: String)`: Uses AI to analyze the resume against the job description
+- `ResumeProcessService.buildAnalysedResults(results: String)`: Parses AI response into structured result data
+- `NeonServices`: Manages database operations for storing and retrieving data
 
 ### Frontend
 

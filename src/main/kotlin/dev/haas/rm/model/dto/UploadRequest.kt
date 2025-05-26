@@ -1,4 +1,4 @@
-package dev.haas.rm.model
+package dev.haas.rm.model.dto
 
 import org.springframework.web.multipart.MultipartFile
 

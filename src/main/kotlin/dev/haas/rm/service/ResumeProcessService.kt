@@ -1,9 +1,10 @@
-package dev.haas.rm.model.services
+package dev.haas.rm.service
 
-import dev.haas.rm.model.AnalysedResults
-import dev.haas.rm.model.NeonModel
-import dev.haas.rm.model.UploadRequest
-import dev.haas.rm.model.repository.NeonRepository
+import dev.haas.rm.model.entity.AnalysedResults
+import dev.haas.rm.model.entity.NeonModel
+import dev.haas.rm.model.dto.UploadRequest
+import dev.haas.rm.repository.NeonRepository
+import dev.haas.rm.service.FileProcessService
 import dev.langchain4j.agent.tool.P
 import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.model.chat.ChatModel
@@ -48,7 +49,7 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
         }
     }
 
-    @Tool("The analysed results are given into a class AnalysedResults ")
+    @Tool("The analysed results are given into a class Analysed Results ")
     fun buildAnalysedResults(
         @P("the analysed string in the format -> matched or not | suggestions | modelUsed") results: String): AnalysedResults {
         val splitResults = results.split("|")

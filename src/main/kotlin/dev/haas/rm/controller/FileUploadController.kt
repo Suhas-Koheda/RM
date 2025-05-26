@@ -1,12 +1,12 @@
 package dev.haas.rm.controller
 
-import dev.haas.rm.model.AnalysedResults
-import dev.haas.rm.model.services.ResumeProcessService
-import dev.haas.rm.model.UploadRequest
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import dev.haas.rm.service.ResumeProcessService
+import dev.haas.rm.model.entity.AnalysedResults
+import dev.haas.rm.model.dto.UploadRequest
 
 @RestController
 @RequestMapping("/analyse")

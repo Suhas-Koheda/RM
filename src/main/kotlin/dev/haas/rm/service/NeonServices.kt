@@ -1,22 +1,23 @@
-package dev.haas.rm.model.services
+package dev.haas.rm.service
 
 import org.springframework.stereotype.Service
 import org.springframework.beans.factory.annotation.Autowired
-import dev.haas.rm.model.repository.NeonRepository
+import dev.haas.rm.repository.NeonRepository
+import dev.haas.rm.model.entity.NeonModel
 
 @Service
 class NeonServices @Autowired constructor(
     private val neonRepository: NeonRepository
 ) {
-    fun saveNeonModel(neonModel: dev.haas.rm.model.NeonModel): dev.haas.rm.model.NeonModel {
+    fun saveNeonModel(neonModel: NeonModel): NeonModel {
         return neonRepository.save(neonModel)
     }
 
-    fun getNeonModelById(id: Long): dev.haas.rm.model.NeonModel? {
+    fun getNeonModelById(id: Long): NeonModel? {
         return neonRepository.findById(id).orElse(null)
     }
 
-    fun getAllNeonModels(): List<dev.haas.rm.model.NeonModel> {
+    fun getAllNeonModels(): List<NeonModel> {
         return neonRepository.findAll()
     }
 

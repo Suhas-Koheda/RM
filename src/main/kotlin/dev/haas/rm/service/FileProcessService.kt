@@ -1,4 +1,4 @@
-package dev.haas.rm.model.services
+package dev.haas.rm.service
 
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
