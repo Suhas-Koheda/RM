@@ -68,4 +68,8 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
             )
         }
     }
+
+    fun getResume(): List<NeonModel> {
+        return neonRepository.findAll()
+    }
 }

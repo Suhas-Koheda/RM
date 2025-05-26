@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile
 import dev.haas.rm.service.ResumeProcessService
 import dev.haas.rm.model.entity.AnalysedResults
 import dev.haas.rm.model.dto.UploadRequest
+import dev.haas.rm.model.entity.NeonModel
 
 @RestController
 @RequestMapping("/analyse")
@@ -20,5 +21,10 @@ class FileUploadController(private val resumeProcessService: ResumeProcessServic
         val uploadRequest = UploadRequest(resumeFile, jd)
         val result = resumeProcessService.processUploadRequest(uploadRequest)
         return ResponseEntity.ok(result)
+    }
+
+    @GetMapping("/resume")
+    fun getResume(): List<NeonModel> {
+        return resumeProcessService.getResume()
     }
 }
