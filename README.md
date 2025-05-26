@@ -23,20 +23,20 @@ The application consists of:
 ## Technology Stack
 
 ### Backend
-- **Language**: Kotlin 1.9.25
-- **Framework**: Spring Boot 3.4.5
+- **Language**: Kotlin
+- **Framework**: Spring Boot
 - **Java Version**: 21
 - **Build Tool**: Maven
 - **AI Integration**: Langchain4j with Google Gemini
-- **PDF Processing**: Apache PDFBox 2.0.30
-- **Testing**: JUnit 5, Mockito-Kotlin
+- **PDF Processing**: Apache PDFBox
+- **Database**: Built-in persistence layer
 
 ### Frontend
-- **Language**: JavaScript/React 18.2.0
-- **UI Framework**: Material UI 5.14.5
-- **HTTP Client**: Axios 1.4.0
-- **Routing**: React Router DOM 6.15.0
-- **Development Server**: React Scripts 5.0.1
+- **Language**: JavaScript/React
+- **UI Framework**: Material UI
+- **HTTP Client**: Axios
+- **Routing**: React Router DOM
+- **Development Server**: React Scripts
 
 ## Component Overview
 
@@ -95,49 +95,50 @@ rm/
 │   ├── main/
 │   │   ├── kotlin/
 │   │   │   └── dev/haas/rm/
-│   │   │       ├── controller/       # @RestController classes
+│   │   │       ├── RmApplication.kt
+│   │   │       ├── controller/
 │   │   │       │   └── FileUploadController.kt
-│   │   │       ├── service/          # Business logic
-│   │   │       │   ├── FileProcessService.kt
-│   │   │       │   ├── ResumeProcessService.kt
-│   │   │       │   └── NeonServices.kt
-│   │   │       ├── repository/       # Database access (Spring Data JPA)
+│   │   │       ├── model/
+│   │   │       │   ├── dto/
+│   │   │       │   │   └── UploadRequest.kt
+│   │   │       │   └── entity/
+│   │   │       │       ├── AnalysedResults.kt
+│   │   │       │       └── NeonModel.kt
+│   │   │       ├── repository/
 │   │   │       │   └── NeonRepository.kt
-│   │   │       ├── model/            # Data classes
-│   │   │       │   ├── entity/       # JPA entities
-│   │   │       │   │   ├── NeonModel.kt
-│   │   │       │   │   └── AnalysedResults.kt
-│   │   │       │   └── dto/          # Request/Response objects
-│   │   │       │       └── UploadRequest.kt
-│   │   │       ├── config/           # Configuration classes
-│   │   │       └── RmApplication.kt
+│   │   │       └── service/
+│   │   │           ├── FileProcessService.kt
+│   │   │           ├── ResumeProcessService.kt
+│   │   │           └── NeonServices.kt
 │   │   └── resources/
+│   │       ├── application.properties
 │   │       ├── static/
-│   │       │   ├── frontend/
-│   │       │   │   ├── public/
-│   │       │   │   └── src/
-│   │       │   │       ├── components/
-│   │       │   │       │   ├── Header.js
-│   │       │   │       │   └── Footer.js
-│   │       │   │       ├── pages/
-│   │       │   │       │   ├── HomePage.js
-│   │       │   │       │   └── ResultsPage.js
-│   │       │   │       └── services/
-│   │       │   │           └── api.js
-│   │       │   └── Suhas_Koheda_Kotlin_Resume.pdf
-│   │       └── application.properties
+│   │       │   ├── Suhas_Koheda_Kotlin_Resume.pdf
+│   │       │   └── frontend/
+│   │       │       ├── package.json
+│   │       │       ├── public/
+│   │       │       │   └── index.html
+│   │       │       └── src/
+│   │       │           ├── App.js
+│   │       │           ├── App.css
+│   │       │           ├── index.js
+│   │       │           ├── components/
+│   │       │           │   ├── Header.js
+│   │       │           │   └── Footer.js
+│   │       │           ├── pages/
+│   │       │           │   ├── HomePage.js
+│   │       │           │   └── ResultsPage.js
+│   │       │           └── services/
+│   │       │               └── api.js
+│   │       └── templates/
 │   └── test/
 │       └── kotlin/
 │           └── dev/haas/rm/
-│               ├── controller/
-│               │   └── FileUploadControllerTest.kt
-│               ├── service/
-│               │   ├── FileProcessServiceTest.kt
-│               │   └── ResumeProcessServiceTest.kt
 │               └── RmApplicationTests.kt
 ├── pom.xml
 ├── run.sh
 ├── run.bat
+├── Dockerfile
 └── README.md
 ```
 
@@ -151,8 +152,7 @@ rm/
 | Kotlin | Programming language | Used for all backend code, providing type safety and modern syntax |
 | Langchain4j | AI integration | Connects with Google's Gemini AI for resume analysis |
 | Apache PDFBox | PDF processing | Extracts text from PDF resumes for analysis |
-| Mockito-Kotlin | Testing | Used for mocking dependencies in unit tests |
-| JUnit 5 | Testing | Used for backend unit testing |
+| Spring Data JPA | Database access | Provides repository pattern implementation for data access |
 
 ### Frontend Libraries
 
@@ -162,7 +162,6 @@ rm/
 | Material UI | Component library | Provides pre-styled components and theming |
 | Axios | HTTP client | Handles API requests to the backend |
 | React Router DOM | Routing | Manages navigation between pages |
-| Emotion | Styling | CSS-in-JS styling solution used by Material UI |
 
 ## Key Functions
 
@@ -170,7 +169,7 @@ rm/
 
 #### Service Layer
 - `FileProcessService.processFile(resume: MultipartFile)`: Extracts text from uploaded resume files
-- `FileUploadController.processUploadRequest(uploadRequest: UploadRequest)`: Processes the uploaded resume and job description
+- `ResumeProcessService.processUploadRequest(uploadRequest: UploadRequest)`: Processes the uploaded resume and job description
 - `ResumeProcessService.analyseResume(resume: String, JD: String)`: Uses AI to analyze the resume against the job description
 - `ResumeProcessService.buildAnalysedResults(results: String)`: Parses AI response into structured result data
 - `NeonServices`: Manages database operations for storing and retrieving data
@@ -214,7 +213,7 @@ This will start:
 - Backend server at http://localhost:8080
 - Frontend development server at http://localhost:3000
 
-**Note for Windows users**: The applications will run in separate windows. Close those windows to stop the application when done.
+**Note**: You can also run the application in Docker using the included Dockerfile.
 
 ## Development
 
@@ -252,12 +251,3 @@ This will start:
 - The match value from the backend is used directly: `const matchPercentage = match;`
 - No multiplication by 100 is performed on the match percentage value
 
-If the issue persists, check the actual value being received from the backend using the browser's developer tools (Network tab) to examine the API response.
-
-## Contributors
-
-- Original development by [Your Name]
-
-## License
-
-[Specify your license here]
