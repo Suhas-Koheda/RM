@@ -13,6 +13,9 @@ function Header() {
           <Button color="inherit" component={RouterLink} to="/">
             Home
           </Button>
+          <Button color="inherit" component={RouterLink} to="/resumes">
+            Resumes
+          </Button>
         </Box>
       </Toolbar>
     </AppBar>

@@ -129,13 +129,23 @@ function HomePage() {
             color="primary"
             fullWidth
             disabled={loading}
-            sx={{ py: 1.5 }}
+            sx={{ py: 1.5, mb: 2 }}
           >
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
               'Analyze Match'
             )}
+          </Button>
+          
+          <Button
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            onClick={() => navigate('/resumes')}
+            sx={{ py: 1.5 }}
+          >
+            View Past Resume Analyses
           </Button>
         </Box>
       </Paper>

@@ -4,16 +4,18 @@ import dev.haas.rm.model.entity.AnalysedResults
 import dev.haas.rm.model.entity.NeonModel
 import dev.haas.rm.model.dto.UploadRequest
 import dev.haas.rm.repository.NeonRepository
-import dev.haas.rm.service.FileProcessService
 import dev.langchain4j.agent.tool.P
 import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.model.chat.ChatModel
 import org.springframework.stereotype.Service
+import java.util.logging.Logger
 
 @Service
 class ResumeProcessService(private val fileProcessService: FileProcessService,
                            private val chatModel: ChatModel,
-                            private val neonRepository: NeonRepository) {
+                           private val neonRepository: NeonRepository) {
+
+    private val logger = Logger.getLogger(ResumeProcessService::class.java.name)
 
     fun processUploadRequest(uploadRequest: UploadRequest): AnalysedResults {
         val fileData = fileProcessService.processFile(uploadRequest.resumeFile)

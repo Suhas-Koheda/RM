@@ -19,3 +19,13 @@ export const analyzeResume = async (resumeFile, jobDescription) => {
     throw error;
   }
 };
+
+export const getResumes = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/resume`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching resumes:', error);
+    throw error;
+  }
+};

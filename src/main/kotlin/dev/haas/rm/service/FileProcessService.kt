@@ -8,7 +8,7 @@ import java.io.BufferedReader
 import java.io.InputStream
 
 @Service
-class FileProcessService {
+public class FileProcessService {
 
     fun processFile(resume: MultipartFile): String {
         if (resume.originalFilename?.endsWith(".pdf", ignoreCase = true) == true) {

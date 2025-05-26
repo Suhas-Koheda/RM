@@ -42,14 +42,22 @@ function ResultsPage() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Button
-        startIcon={<ArrowBackIcon />}
-        onClick={() => navigate('/')}
-        sx={{ mb: 2 }}
-        color="primary"
-      >
-        Back to Home
-      </Button>
+      <Box sx={{ display: 'flex', mb: 2, gap: 2 }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/')}
+          color="primary"
+        >
+          Back to Home
+        </Button>
+        <Button
+          onClick={() => navigate('/resumes')}
+          color="secondary"
+          variant="outlined"
+        >
+          View All Resumes
+        </Button>
+      </Box>
 
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom align="center">

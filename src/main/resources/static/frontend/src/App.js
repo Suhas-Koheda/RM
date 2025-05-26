@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import ResultsPage from './pages/ResultsPage';
+import ResumesPage from './pages/ResumesPage';
 import './App.css';
 
 const theme = createTheme({
@@ -33,6 +34,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/results" element={<ResultsPage />} />
+              <Route path="/resumes" element={<ResumesPage />} />
             </Routes>
           </main>
           <Footer />
