@@ -31,7 +31,7 @@ use_maven_wrapper() {
     chmod +x "$mvnw_cmd" 2>/dev/null
   fi
   
-  $mvnw_cmd "$@"
+  $mvnw_cmd clean package -DskipTests
 }
 
 # Print banner
@@ -44,24 +44,27 @@ command_exists java || error_exit "Java is not installed. Please install Java 21
 command_exists node || error_exit "Node.js is not installed. Please install Node.js."
 command_exists npm || error_exit "npm is not installed. Please install npm."
 
-echo -e "\n[1/4] Building backend..."
+echo -e "\n[1/4] Building backend (clean build)..."
 # Navigate to backend directory and build with Maven wrapper
 cd "$BACKEND_DIR" || error_exit "Cannot navigate to backend directory"
-use_maven_wrapper package -DskipTests || error_exit "Backend build failed"
+use_maven_wrapper || error_exit "Backend build failed"
 echo "Backend build successful!"
 
 echo -e "\n[2/4] Installing frontend dependencies if needed..."
-# Navigate to frontend directory and install dependencies if needed
-cd "$FRONTEND_DIR" || error_exit "Cannot navigate to frontend directory"
-if [ ! -d "node_modules" ]; then
-  echo "Node modules not found, installing dependencies..."
+# Install frontend dependencies if needed
+if [ ! -d "$FRONTEND_DIR/node_modules" ]; then
+  echo "Installing frontend dependencies..."
+  cd "$FRONTEND_DIR" || error_exit "Cannot navigate to frontend directory"
   npm install || error_exit "Frontend dependency installation failed"
+  cd - > /dev/null
 else
   echo "Node modules found, checking for react-scripts..."
   # Check if react-scripts is installed
-  if [ ! -d "node_modules/react-scripts" ]; then
+  if [ ! -d "$FRONTEND_DIR/node_modules/react-scripts" ]; then
     echo "react-scripts not found, installing..."
+    cd "$FRONTEND_DIR" || error_exit "Cannot navigate to frontend directory"
     npm install react-scripts --save-dev || error_exit "Failed to install react-scripts"
+    cd - > /dev/null
   fi
 fi
 echo "Frontend dependencies ready!"
