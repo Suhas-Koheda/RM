@@ -15,7 +15,7 @@ data class NeonModel(
     val id: Long? = null,
 
     @Column
-    val title: String="default title",
+    val title: String,
 
     @Column(columnDefinition = "TEXT", nullable = false)
     val resume: String,

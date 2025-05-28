@@ -16,9 +16,10 @@ class FileUploadController(private val resumeProcessService: ResumeProcessServic
     @PostMapping("/upload", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun getFileUpload(
         @RequestParam("resumeFile") resumeFile: MultipartFile,
-        @RequestParam("JD") jd: String
+        @RequestParam("JD") jd:String,
+        @RequestParam("title") title: String,
     ): ResponseEntity<AnalysedResults> {
-        val uploadRequest = UploadRequest(resumeFile, jd)
+        val uploadRequest = UploadRequest(resumeFile, jd, title)
         val result = resumeProcessService.processUploadRequest(uploadRequest)
         return ResponseEntity.ok(result)
     }

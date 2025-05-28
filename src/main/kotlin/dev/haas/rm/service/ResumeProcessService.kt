@@ -7,22 +7,20 @@ import dev.haas.rm.repository.NeonRepository
 import dev.langchain4j.agent.tool.P
 import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.model.chat.ChatModel
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import java.util.logging.Logger
 
 @Service
 class ResumeProcessService(private val fileProcessService: FileProcessService,
                            private val chatModel: ChatModel,
                            private val neonRepository: NeonRepository) {
 
-    private val logger = Logger.getLogger(ResumeProcessService::class.java.name)
-
     fun processUploadRequest(uploadRequest: UploadRequest): AnalysedResults {
         val fileData = fileProcessService.processFile(uploadRequest.resumeFile)
-        return analyseResume(fileData, uploadRequest.JD)
+        return analyseResume(fileData, uploadRequest.JD,uploadRequest.title)
     }
 
-    fun analyseResume(resume: String, JD: String): AnalysedResults {
+    fun analyseResume(resume: String, JD: String, title:String ): AnalysedResults {
         val analyseTemplate = """
             I need you to analyze a resume against a job description.
             First you need to check if the resume is written using AI 
@@ -47,7 +45,12 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
         """.trimIndent()
 
         return buildAnalysedResults(chatModel.chat(analyseTemplate)).also {
-            neonRepository.save(NeonModel(resume=resume, analysedResults = it, userID = 1))
+            neonRepository.save(NeonModel(
+                resume = resume,
+                analysedResults = it,
+                userID = SecurityContextHolder.getContext().authentication.principal as Long,
+                title = title
+            ))
         }
     }
 
