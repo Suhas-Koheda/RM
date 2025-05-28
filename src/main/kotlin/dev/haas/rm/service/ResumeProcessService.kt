@@ -75,6 +75,6 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
     }
 
     fun getResume(): List<NeonModel> {
-        return neonRepository.findAll()
+        return neonRepository.findAllById(SecurityContextHolder.getContext().authentication.principal as Long)
     }
 }
