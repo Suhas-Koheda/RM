@@ -72,7 +72,7 @@ echo "Frontend dependencies ready!"
 # Start the backend in the background
 echo -e "\n[3/4] Starting Spring Boot backend..."
 cd "$BACKEND_DIR" || error_exit "Cannot navigate to backend directory"
-java -jar target/rm-0.0.1-SNAPSHOT.jar &
+java -jar rm-0.0.1-SNAPSHOT.jar &
 BACKEND_PID=$!
 echo "Backend started with PID: $BACKEND_PID"
 

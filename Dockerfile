@@ -41,7 +41,7 @@ COPY src ./src
 COPY --from=frontend-builder /app/frontend/build ./src/main/resources/static
 
 # Build the Spring Boot application, skipping tests for faster Docker builds
-# The target JAR will be in /app/target/
+# The target JAR will be in /app/
 RUN mvn package -DskipTests
 
 # Stage 3: Create Final Application Image
