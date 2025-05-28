@@ -1,16 +1,7 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
 .factorypath
 .project
 .settings
-.springBeans
+.mvn/wrapper/maven-wrapper.jar
 .sts4-cache
 
 ### IntelliJ IDEA ###

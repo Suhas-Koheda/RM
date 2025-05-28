@@ -1,0 +1,253 @@
+# Resume Matcher
+
+A full-stack application that analyzes resumes against job descriptions using AI to help job seekers improve their resume match rate.
+
+## Project Overview
+
+Resume Matcher is a web application that allows users to upload their resume and a job description, then uses AI (Google's Gemini) to analyze how well the resume matches the job requirements. The application provides a match percentage and suggestions for improving the resume.
+
+The application consists of:
+- A Kotlin/Spring Boot backend for processing files and integrating with AI services
+- A React frontend with Material UI for user interaction
+- PDF processing capabilities for extracting text from resume PDFs
+
+## Features
+
+- Upload resume files (PDF or text format)
+- Enter job descriptions
+- Analyze resume-job description match using AI
+- View match percentage and score
+- Get personalized suggestions to improve resume match
+- Clean and responsive UI with Material Design
+
+## Technology Stack
+
+### Backend
+- **Language**: Kotlin
+- **Framework**: Spring Boot
+- **Java Version**: 21
+- **Build Tool**: Maven
+- **AI Integration**: Langchain4j with Google Gemini
+- **PDF Processing**: Apache PDFBox
+- **Database**: Built-in persistence layer
+
+### Frontend
+- **Language**: JavaScript/React
+- **UI Framework**: Material UI
+- **HTTP Client**: Axios
+- **Routing**: React Router DOM
+- **Development Server**: React Scripts
+
+## Component Overview
+
+### Backend Components
+
+#### Controllers
+- `FileUploadController`: Handles file uploads and processes analysis requests
+
+#### Services
+- `FileProcessService`: Service for processing and extracting text from uploaded files
+- `ResumeProcessService`: Service for analyzing resume text against job descriptions using AI
+- `NeonServices`: Service for database operations
+
+#### Repository
+- `NeonRepository`: Interface for database access
+
+#### Models
+- Entity
+  - `AnalysedResults`: Data class for storing analysis results (match percentage, suggestions, model used)
+  - `NeonModel`: Entity model for database operations
+- DTO
+  - `UploadRequest`: Data class for handling the uploaded resume and job description
+
+### Frontend Components
+
+#### Pages
+- `HomePage`: Landing page with file upload and job description input
+- `ResultsPage`: Displays analysis results including match percentage and suggestions
+
+#### Components
+- `Header`: Navigation header component
+- `Footer`: Application footer component
+
+#### Services
+- `api.js`: Contains API calls to the backend
+
+## Core Functionality
+
+### Resume Processing
+The application extracts text from uploaded resumes (PDF or text) using Apache PDFBox for PDF files.
+
+### AI Analysis
+The Langchain4j integration with Google Gemini analyzes:
+1. How well the resume matches the job description
+2. Generates a match percentage
+3. Provides suggestions for improvement
+
+### User Interface
+The React frontend provides an intuitive interface for uploading resumes, entering job descriptions, and viewing results in a user-friendly format.
+
+## Project Structure
+
+```
+rm/
+├── src/
+│   ├── main/
+│   │   ├── kotlin/
+│   │   │   └── dev/haas/rm/
+│   │   │       ├── RmApplication.kt
+│   │   │       ├── controller/
+│   │   │       │   └── FileUploadController.kt
+│   │   │       ├── model/
+│   │   │       │   ├── dto/
+│   │   │       │   │   └── UploadRequest.kt
+│   │   │       │   └── entity/
+│   │   │       │       ├── AnalysedResults.kt
+│   │   │       │       └── NeonModel.kt
+│   │   │       ├── repository/
+│   │   │       │   └── NeonRepository.kt
+│   │   │       └── service/
+│   │   │           ├── FileProcessService.kt
+│   │   │           ├── ResumeProcessService.kt
+│   │   │           └── NeonServices.kt
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── static/
+│   │       │   ├── Suhas_Koheda_Kotlin_Resume.pdf
+│   │       │   └── frontend/
+│   │       │       ├── package.json
+│   │       │       ├── public/
+│   │       │       │   └── index.html
+│   │       │       └── src/
+│   │       │           ├── App.js
+│   │       │           ├── App.css
+│   │       │           ├── index.js
+│   │       │           ├── components/
+│   │       │           │   ├── Header.js
+│   │       │           │   └── Footer.js
+│   │       │           ├── pages/
+│   │       │           │   ├── HomePage.js
+│   │       │           │   └── ResultsPage.js
+│   │       │           └── services/
+│   │       │               └── api.js
+│   │       └── templates/
+│   └── test/
+│       └── kotlin/
+│           └── dev/haas/rm/
+│               └── RmApplicationTests.kt
+├── pom.xml
+├── run.sh
+├── run.bat
+├── Dockerfile
+└── README.md
+```
+
+## Libraries Used and Their Purpose
+
+### Backend Libraries
+
+| Library | Purpose | Usage |
+|---------|---------|-------|
+| Spring Boot | Application framework | Forms the backbone of the application, providing web functionality |
+| Kotlin | Programming language | Used for all backend code, providing type safety and modern syntax |
+| Langchain4j | AI integration | Connects with Google's Gemini AI for resume analysis |
+| Apache PDFBox | PDF processing | Extracts text from PDF resumes for analysis |
+| Spring Data JPA | Database access | Provides repository pattern implementation for data access |
+
+### Frontend Libraries
+
+| Library | Purpose | Usage |
+|---------|---------|-------|
+| React | UI library | Core frontend framework |
+| Material UI | Component library | Provides pre-styled components and theming |
+| Axios | HTTP client | Handles API requests to the backend |
+| React Router DOM | Routing | Manages navigation between pages |
+
+## Key Functions
+
+### Backend
+
+#### Service Layer
+- `FileProcessService.processFile(resume: MultipartFile)`: Extracts text from uploaded resume files
+- `ResumeProcessService.processUploadRequest(uploadRequest: UploadRequest)`: Processes the uploaded resume and job description
+- `ResumeProcessService.analyseResume(resume: String, JD: String)`: Uses AI to analyze the resume against the job description
+- `ResumeProcessService.buildAnalysedResults(results: String)`: Parses AI response into structured result data
+- `NeonServices`: Manages database operations for storing and retrieving data
+
+### Frontend
+
+- `handleFileChange()`: Processes file uploads in the UI
+- `handleSubmit()`: Sends analysis request to the backend
+- `analyzeResume()`: API service function that communicates with the backend
+- `getMatchColor()`: Determines the color coding based on match percentage
+
+## Running the Application
+
+The project includes convenient startup scripts for both Unix-like systems (Linux, macOS) and Windows:
+
+### Prerequisites
+
+- Java 21 or later
+- Node.js and npm
+- Maven (wrapper included)
+
+### Starting the Application on Linux/macOS
+
+```bash
+./run.sh
+```
+
+### Starting the Application on Windows
+
+```cmd
+run.bat
+```
+
+Either script will:
+1. Build the backend using Maven
+2. Install frontend dependencies if needed
+3. Start the Spring Boot backend
+4. Start the React frontend development server
+
+This will start:
+- Backend server at http://localhost:8080
+- Frontend development server at http://localhost:3000
+
+**Note**: You can also run the application in Docker using the included Dockerfile.
+
+## Development
+
+### Backend Development
+
+- Run tests: `./mvnw test`
+- Build: `./mvnw clean package`
+
+### Frontend Development
+
+- Install dependencies: `cd src/main/resources/static/frontend && npm install`
+- Start development server: `npm start`
+
+## Future Enhancements
+
+- User authentication system
+- Save analysis history
+- Compare multiple job descriptions
+- Export analysis results
+- Enhanced AI suggestions
+- Custom resume templates
+
+## Known Issues and Troubleshooting
+
+### Match Percentage Display Issue
+
+**Issue**: The match percentage may display incorrectly (e.g., showing 7800% instead of 78%).
+
+**Cause**: There's a mismatch in how the match percentage is handled between the backend and frontend:
+- The backend (`ResumeProcessService.kt`) returns the match percentage as a value between 0-100 (e.g., 78.0)
+- The Material UI `LinearProgress` component expects values in the same range (0-100)
+- No conversion is needed, but if the backend returns the value in a different format, display issues occur
+
+**Solution**: Ensure that the match percentage is not converted again in the frontend. In `ResultsPage.js`, make sure:
+- The match value from the backend is used directly: `const matchPercentage = match;`
+- No multiplication by 100 is performed on the match percentage value
+
