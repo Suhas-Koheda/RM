@@ -81,8 +81,13 @@ cd "%BACKEND_DIR%" || (
     echo ERROR: Cannot navigate to backend directory
     exit /b 1
 )
-start "" java -jar target\rm-0.0.1-SNAPSHOT.jar
-echo Backend started successfully!
+:: Start the backend and log output
+cd "%BACKEND_DIR%" || (
+    echo ERROR: Cannot navigate to backend directory
+    exit /b 1
+)
+start "" cmd /c "java -jar target\RecuritrManager-0.0.1-SNAPSHOT.jar > "%BASE_DIR%backend.log" 2>&1"
+echo Backend started successfully! (logs: %BASE_DIR%backend.log)
 
 :: Give the backend a moment to start
 timeout /t 3 /nobreak >nul
@@ -94,9 +99,11 @@ cd "%FRONTEND_DIR%" || (
     echo ERROR: Cannot navigate to frontend directory
     exit /b 1
 )
-:: Use npx to ensure react-scripts is found
-start "" npx react-scripts start
-echo Frontend started successfully!
+:: Start the frontend and log output
+cd "%FRONTEND_DIR%" || (
+)
+start "" cmd /c "npx react-scripts start > "%BASE_DIR%frontend.log" 2>&1"
+echo Frontend started successfully! (logs: %BASE_DIR%frontend.log)
 
 echo.
 echo ======================================================
@@ -107,5 +114,6 @@ echo ======================================================
 echo.
 echo The applications are running in separate windows.
 echo Close those windows to stop the applications when done.
-echo Press any key to exit this script...
-pause >nul
+echo.
+echo Showing live logs. Press Ctrl+C to stop viewing logs.
+powershell -Command "Get-Content -Path '%BASE_DIR%backend.log','%BASE_DIR%frontend.log' -Wait"

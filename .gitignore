@@ -1,42 +1,42 @@
-.factorypath
-.project
-.settings
-.mvn/wrapper/maven-wrapper.jar
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
+# IDE and build system
+.idea/
 *.iws
 *.iml
 *.ipr
+.vscode/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# Maven/Java
+.mvn/wrapper/maven-wrapper.jar
+.sts4-cache
+.project
+.settings
+nbproject/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-
-### VS Code ###
-.vscode/
+target/
 
 # Node/React frontend
 src/main/resources/static/frontend/node_modules/
 src/main/resources/static/frontend/build/
-# .env and log files
-src/main/resources/static/frontend/.env
-src/main/resources/static/frontend/npm-debug.log
-src/main/resources/static/frontend/.DS_Store
 src/main/resources/static/frontend/.next/
 src/main/resources/static/frontend/.cache/
-# npm logs
-yarn-debug.log*
-yarn-error.log*
-# Editor/OS
+src/main/resources/static/frontend/.env*
+src/main/resources/static/frontend/npm-debug.log*
+src/main/resources/static/frontend/yarn-debug.log*
+src/main/resources/static/frontend/yarn-error.log*
+src/main/resources/static/frontend/.DS_Store
 src/main/resources/static/frontend/.vscode/
-# End of frontend ignores
 
-target/
+# Ignore all backend and frontend build/target folders
+**/target/
+**/build/
+
+# General
+.DS_Store
+.env*
+*.log

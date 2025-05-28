@@ -69,23 +69,20 @@ else
 fi
 echo "Frontend dependencies ready!"
 
-# Start the backend in the background
-echo -e "\n[3/4] Starting Spring Boot backend..."
+# Start the backend in the background and log output
 cd "$BACKEND_DIR" || error_exit "Cannot navigate to backend directory"
-java -jar rm-0.0.1-SNAPSHOT.jar &
+java -jar target/RecuritrManager-0.0.1-SNAPSHOT.jar > "$BASE_DIR/backend.log" 2>&1 &
 BACKEND_PID=$!
-echo "Backend started with PID: $BACKEND_PID"
+echo "Backend started with PID: $BACKEND_PID (logs: $BASE_DIR/backend.log)"
 
 # Give the backend a moment to start
 sleep 3
 
-# Start the frontend
-echo -e "\n[4/4] Starting React frontend..."
+# Start the frontend and log output
 cd "$FRONTEND_DIR" || error_exit "Cannot navigate to frontend directory"
-# Use npx to ensure react-scripts is found
-npx react-scripts start &
+npx react-scripts start > "$BASE_DIR/frontend.log" 2>&1 &
 FRONTEND_PID=$!
-echo "Frontend started with PID: $FRONTEND_PID"
+echo "Frontend started with PID: $FRONTEND_PID (logs: $BASE_DIR/frontend.log)"
 
 echo -e "\n======================================================"
 echo "Resume Matcher is now running!"
@@ -94,8 +91,11 @@ echo "Backend: http://localhost:8080"
 echo "======================================================"
 echo -e "\nPress Ctrl+C to shut down both services..."
 
+# Show logs after startup
+tail -f "$BASE_DIR/backend.log" "$BASE_DIR/frontend.log"
+
 # Setup trap to handle cleanup on script termination
 trap "echo -e '\nShutting down services...'; kill $FRONTEND_PID 2>/dev/null; kill $BACKEND_PID 2>/dev/null; echo 'Services stopped.'; exit 0" INT TERM
 
 # Wait for user to press Ctrl+C
-wait
+wait &

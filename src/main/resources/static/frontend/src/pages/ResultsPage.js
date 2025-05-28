@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -18,6 +18,12 @@ function ResultsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { result, jobDescription, fileName } = location.state || {};
+
+  useEffect(() => {
+    if (!localStorage.getItem('accessToken')) {
+      navigate('/auth');
+    }
+  }, [navigate]);
 
   if (!result) {
     navigate('/');

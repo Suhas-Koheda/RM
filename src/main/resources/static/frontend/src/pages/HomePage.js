@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Container, 
@@ -33,6 +33,12 @@ function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fileName, setFileName] = useState('No file selected');
+
+  useEffect(() => {
+    if (!localStorage.getItem('accessToken')) {
+      navigate('/auth');
+    }
+  }, [navigate]);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];

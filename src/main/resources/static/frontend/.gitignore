@@ -10,8 +10,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Misc
-.env
-.env.*
+.env*
 
 # Editor folders
 .vscode/
@@ -20,8 +19,6 @@ yarn-error.log*
 # Mac system files
 .DS_Store
 
-# React specific
-*.env.local
-*.env.development.local
-*.env.test.local
-*.env.production.local
+# Next.js/React cache
+.next/
+.cache/
