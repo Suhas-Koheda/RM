@@ -10,7 +10,7 @@ import java.util.*
 @Service
 class JwtService{
 
-    private val secretKey="sefygiwsefwsekghse"
+    private val secretKey="sefygiwsefwsekghseasfialsgaeufgalkeflaieufgalie"
     private val secretKeyBytes = Keys.hmacShaKeyFor(secretKey.toByteArray())
 
      val accessTokenValidationTime=15L*60L*1000L

@@ -14,7 +14,10 @@ class SecurityConfig {
             http
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-
+                .authorizeHttpRequests {
+                    it.requestMatchers("/auth/**").permitAll()
+                    it.anyRequest().authenticated()
+                }
         return http.build()
     }
 

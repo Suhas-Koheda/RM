@@ -80,6 +80,10 @@ class AuthService (
         )
     }
 
+    fun isMailPresent(email:String):Boolean{
+        return userRepository.findByEmail(email)!=null
+    }
+
     data class TokenPair(
         val accessToken: String,
         val refreshToken: String

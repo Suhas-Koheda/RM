@@ -1,6 +1,7 @@
 package dev.haas.rm.controller
 
 import dev.haas.rm.config.security.AuthService
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -21,10 +22,15 @@ class AuthController (private val authService: AuthService){
     @PostMapping("/register")
     fun register(
         @RequestBody authReq: AuthReq
-    ){
-      authService.register(authReq.userId,authReq.pwd)
+    ): String {
+        authService.register(authReq.userId,authReq.pwd)
+        return "Registration successful"
     }
 
+    @GetMapping("/email")
+    fun validateMail(@RequestBody email:String): Boolean {
+        return authService.isMailPresent(email)
+    }
 
     @PostMapping("/refresh")
     fun refresh(
