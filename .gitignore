@@ -38,3 +38,5 @@ yarn-error.log*
 # Editor/OS
 src/main/resources/static/frontend/.vscode/
 # End of frontend ignores
+
+target/
