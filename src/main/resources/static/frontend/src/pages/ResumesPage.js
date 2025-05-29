@@ -19,8 +19,9 @@ import {
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StorageIcon from '@mui/icons-material/Storage';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
-import { getResumes } from '../services/api';
+import { getResumes, deleteResume } from '../services/api';
 
 function ResumesPage() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ function ResumesPage() {
   const [error, setError] = useState('');
   const [resumes, setResumes] = useState([]);
   const [selectedResume, setSelectedResume] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchResumes();
@@ -51,6 +53,20 @@ function ResumesPage() {
 
   const backToList = () => {
     setSelectedResume(null);
+  };
+
+  const handleDelete = async (id) => {
+    setDeleting(true);
+    setError('');
+    try {
+      await deleteResume(id);
+      fetchResumes();
+      setSelectedResume(null);
+    } catch (err) {
+      setError('Failed to delete resume. Please try again.');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const getMatchColor = (percentage) => {
@@ -199,6 +215,17 @@ function ResumesPage() {
                       onClick={() => viewResumeDetails(resume)}
                     >
                       View Details
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      sx={{ ml: 1 }}
+                      onClick={() => handleDelete(resume.id)}
+                      disabled={deleting}
+                    >
+                      {deleting ? 'Deleting...' : 'Delete'}
                     </Button>
                   </TableCell>
                 </TableRow>

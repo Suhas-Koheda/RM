@@ -30,6 +30,37 @@ function ResultsPage() {
     return null;
   }
 
+  // Check for special error message from backend (when resume limit is reached)
+  if (result.suggestions && result.suggestions.includes('Cannot Analyse resumes further')) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 6 }}>
+        <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="h5" color="error" gutterBottom>
+            Resume Analysis Limit Reached
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 3 }}>
+            {result.suggestions}
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate('/resumes')}
+            sx={{ mr: 2 }}
+          >
+            View & Delete Previous Analyses
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate('/')}
+          >
+            Back to Home
+          </Button>
+        </Paper>
+      </Container>
+    );
+  }
+
   const { match, suggestions, modelUsed } = result;
   const matchPercentage = match;
 

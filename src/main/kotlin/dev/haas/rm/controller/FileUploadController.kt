@@ -19,7 +19,7 @@ class FileUploadController(private val resumeProcessService: ResumeProcessServic
         @RequestParam("JD") jd:String,
         @RequestParam("title") title: String,
     ): ResponseEntity<AnalysedResults> {
-        if(getResume().size>10){
+        if(getResume().size==5){
             return ResponseEntity.ok(
                 AnalysedResults(
                     suggestions = "Cannot Analyse resumes further since this is in development stage . \n Thank you for trying \n Delete any resume before trying for other analysis",

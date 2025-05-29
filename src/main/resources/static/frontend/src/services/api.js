@@ -93,3 +93,17 @@ export const validateEmail = async (email) => {
     throw error;
   }
 };
+
+export const deleteResume = async (id) => {
+  try {
+    const response = await axios.post(`${ANALYSE_URL}/delete/${id}`, {}, {
+      headers: {
+        ...(localStorage.getItem('accessToken') && { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` })
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting resume:', error);
+    throw error;
+  }
+};
