@@ -9,18 +9,32 @@ import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.model.chat.ChatModel
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import java.util.logging.Logger
 
 @Service
 class ResumeProcessService(private val fileProcessService: FileProcessService,
                            private val chatModel: ChatModel,
                            private val neonRepository: NeonRepository) {
 
+    private val logger = Logger.getLogger(ResumeProcessService::class.java.name)
+
     fun processUploadRequest(uploadRequest: UploadRequest): AnalysedResults {
-        val fileData = fileProcessService.processFile(uploadRequest.resumeFile)
-        return analyseResume(fileData, uploadRequest.JD,uploadRequest.title)
+        try {
+            val fileData = fileProcessService.processFile(uploadRequest.resumeFile)
+            return analyseResume(fileData, uploadRequest.JD, uploadRequest.title)
+        } catch (e: Exception) {
+            logger.severe("Error processing upload request: ${e.message}")
+            return AnalysedResults(
+                match = 0.0,
+                suggestions = "Error processing your request: ${e.message}",
+                modelUsed = "error",
+                jD = uploadRequest.JD,
+                resume = ""
+            )
+        }
     }
 
-    fun analyseResume(resume: String, JD: String, title:String ): AnalysedResults {
+    fun analyseResume(resume: String, JD: String, title: String): AnalysedResults {
         val analyseTemplate = """
             I need you to analyze a resume against a job description.
             First you need to check if the resume is written using AI 
@@ -123,44 +137,104 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
             [match percentage]|<h3>Suggestion 1</h3><h5>Details 1</h5><h3>Suggestion 2</h3><h5>Details 2</h5>...|[model name]|Resume in the overleaf format 
         """.trimIndent()
 
-        return buildAnalysedResults(chatModel.chat(analyseTemplate),JD).also {
-            neonRepository.save(NeonModel(
-                analysedResults = it,
-                userID = SecurityContextHolder.getContext().authentication.principal as Long,
-                title = title
-            ))
+        try {
+            val chatResponse = chatModel.chat(analyseTemplate)
+            val result = buildAnalysedResults(chatResponse, JD)
+
+            try {
+                val userId = getCurrentUserId()
+                neonRepository.save(NeonModel(
+                    analysedResults = result,
+                    userID = userId,
+                    title = title
+                ))
+            } catch (e: Exception) {
+                logger.severe("Error saving to repository: ${e.message}")
+                // Continue returning results even if saving fails
+            }
+
+            return result
+        } catch (e: Exception) {
+            logger.severe("Error in AI analysis: ${e.message}")
+            return AnalysedResults(
+                match = 0.0,
+                suggestions = "Error during analysis: ${e.message}",
+                modelUsed = "error",
+                jD = JD,
+                resume = resume
+            )
+        }
+    }
+
+    private fun getCurrentUserId(): Long {
+        return try {
+            SecurityContextHolder.getContext().authentication?.principal as? Long
+                ?: throw IllegalStateException("User not authenticated or invalid user ID")
+        } catch (e: Exception) {
+            logger.severe("Error getting user ID: ${e.message}")
+            throw e
         }
     }
 
     @Tool("The analysed results are given into a class Analysed Results ")
     fun buildAnalysedResults(
-        @P("the analysed string in the format -> matched or not | suggestions | modelUsed") results: String,jD:String): AnalysedResults {
+        @P("the analysed string in the format -> matched or not | suggestions | modelUsed") results: String, jD: String): AnalysedResults {
         val splitResults = results.split("|")
         return try {
             println(splitResults)
+
+            // Check if the response has enough parts before accessing them
+            if (splitResults.size < 3) {
+                return AnalysedResults(
+                    match = 0.0,
+                    suggestions = "Incomplete response format from AI model",
+                    modelUsed = "unknown",
+                    jD = jD,
+                    resume = ""
+                )
+            }
+
+            val match = try {
+                splitResults[0].trim().toDouble()
+            } catch (e: NumberFormatException) {
+                0.0
+            }
+
             AnalysedResults(
-                match = splitResults[0].trim().toDouble(),
+                match = match,
                 suggestions = splitResults[1].trim(),
                 modelUsed = splitResults[2].trim(),
-                jD=jD,
-                resume = splitResults[3].trim()
+                jD = jD,
+                resume = if (splitResults.size > 3) splitResults[3].trim() else ""
             )
         } catch (e: Exception) {
+            logger.severe("Error parsing AI response: ${e.message}")
             AnalysedResults(
                 match = 0.0,
                 suggestions = "Error parsing response: ${e.message}. Original response: $results",
                 modelUsed = "unknown",
-                jD=jD,
+                jD = jD,
                 resume = ""
             )
         }
     }
 
     fun getResume(): List<NeonModel> {
-        return neonRepository.findAllByUserID(SecurityContextHolder.getContext().authentication.principal as Long).also { println(SecurityContextHolder.getContext().authentication.principal as Long) }
+        try {
+            val userId = getCurrentUserId()
+            return neonRepository.findAllByUserID(userId)
+        } catch (e: Exception) {
+            logger.severe("Error retrieving resumes: ${e.message}")
+            return emptyList()
+        }
     }
 
-    fun deleteResumeById(id:Long){
-        return neonRepository.deleteById(id)
+    fun deleteResumeById(id: Long) {
+        try {
+            neonRepository.deleteById(id)
+        } catch (e: Exception) {
+            logger.severe("Error deleting resume with ID $id: ${e.message}")
+            throw e
+        }
     }
 }
