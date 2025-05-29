@@ -44,7 +44,7 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
             [match percentage]|<h3>Suggestion 1</h3><h5>Details 1</h5><h3>Suggestion 2</h3><h5>Details 2</h5>...|[model name]
         """.trimIndent()
 
-        return buildAnalysedResults(chatModel.chat(analyseTemplate)).also {
+        return buildAnalysedResults(chatModel.chat(analyseTemplate),JD).also {
             neonRepository.save(NeonModel(
                 resume = resume,
                 analysedResults = it,
@@ -56,25 +56,31 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
 
     @Tool("The analysed results are given into a class Analysed Results ")
     fun buildAnalysedResults(
-        @P("the analysed string in the format -> matched or not | suggestions | modelUsed") results: String): AnalysedResults {
+        @P("the analysed string in the format -> matched or not | suggestions | modelUsed") results: String,jD:String): AnalysedResults {
         val splitResults = results.split("|")
         return try {
             println(splitResults)
             AnalysedResults(
                 match = splitResults[0].trim().toDouble(),
                 suggestions = splitResults[1].trim(),
-                modelUsed = splitResults[2].trim()
+                modelUsed = splitResults[2].trim(),
+                jD=jD
             )
         } catch (e: Exception) {
             AnalysedResults(
                 match = 0.0,
                 suggestions = "Error parsing response: ${e.message}. Original response: $results",
-                modelUsed = "unknown"
+                modelUsed = "unknown",
+                jD=jD
             )
         }
     }
 
     fun getResume(): List<NeonModel> {
-        return neonRepository.findAllById(SecurityContextHolder.getContext().authentication.principal as Long)
+        return neonRepository.findAllByUserID(SecurityContextHolder.getContext().authentication.principal as Long).also { println(SecurityContextHolder.getContext().authentication.principal as Long) }
+    }
+
+    fun deleteResumeById(id:Long){
+        return neonRepository.deleteById(id)
     }
 }

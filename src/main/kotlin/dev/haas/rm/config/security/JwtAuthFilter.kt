@@ -1,14 +1,13 @@
 package dev.haas.rm.config.security
 
-import io.jsonwebtoken.Jwt
+import dev.haas.rm.service.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.filter.OncePerRequestFilter
-import java.net.http.HttpHeaders
 import org.springframework.stereotype.Component
 
 @Component
@@ -25,7 +24,7 @@ class JwtAuthFilter(
             val token = authHeader.substringAfter("Bearer ").trim()
             if (jwtService.validateAccessToken(token)) {
                 val userId = jwtService.getUserId(token)
-                val auth = UsernamePasswordAuthenticationToken(userId, null)
+                val auth = UsernamePasswordAuthenticationToken(userId, null,listOf(SimpleGrantedAuthority("USER")))
                 SecurityContextHolder.getContext().authentication = auth
             }
         }

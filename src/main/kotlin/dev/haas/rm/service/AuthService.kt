@@ -1,5 +1,6 @@
-package dev.haas.rm.config.security
+package dev.haas.rm.service
 
+import dev.haas.rm.util.Encoder
 import dev.haas.rm.model.entity.RefreshToken
 import dev.haas.rm.model.entity.User
 import dev.haas.rm.repository.RefreshTokenRepository

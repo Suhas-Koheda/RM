@@ -1,4 +1,4 @@
-package dev.haas.rm.config.security
+package dev.haas.rm.util
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component

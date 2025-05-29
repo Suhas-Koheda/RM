@@ -22,7 +22,7 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
                     config
                 }
             }
-            .csrf { it.disable() }
+                .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
                 .authorizeHttpRequests {
                     it.requestMatchers("/auth/**","/").permitAll()

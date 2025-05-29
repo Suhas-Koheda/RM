@@ -30,6 +30,7 @@ function HomePage() {
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [jobDescription, setJobDescription] = useState('');
+  const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fileName, setFileName] = useState('No file selected');
@@ -47,10 +48,12 @@ function HomePage() {
           selectedFile.type === 'text/plain') {
         setFile(selectedFile);
         setFileName(selectedFile.name);
+        setTitle(selectedFile.name.replace(/\.[^/.]+$/, ''));
         setError('');
       } else {
         setFile(null);
         setFileName('No file selected');
+        setTitle('');
         setError('Please upload a PDF or text file');
       }
     }
@@ -58,6 +61,10 @@ function HomePage() {
 
   const handleJobDescriptionChange = (event) => {
     setJobDescription(event.target.value);
+  };
+
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value);
   };
 
   const handleSubmit = async (event) => {
@@ -70,10 +77,14 @@ function HomePage() {
       setError('Please enter a job description.');
       return;
     }
+    if (!title.trim()) {
+      setError('Please enter a resume title.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
-      const result = await analyzeResume(file, jobDescription, file.name);
+      const result = await analyzeResume(file, jobDescription, title);
       navigate('/results', { state: { result, jobDescription, fileName: file.name } });
     } catch (err) {
       setError('Failed to analyze resume. Please try again.');
@@ -114,6 +125,15 @@ function HomePage() {
               Accepted formats: PDF, txt
             </Typography>
           </Box>
+          <TextField
+            fullWidth
+            label="Resume Title"
+            value={title}
+            onChange={handleTitleChange}
+            sx={{ mb: 3 }}
+            placeholder="Enter a title for this resume (e.g., Frontend Developer Resume)"
+            required
+          />
           <TextField
             fullWidth
             label="Job Description"

@@ -1,4 +1,4 @@
-package dev.haas.rm.config.security
+package dev.haas.rm.service
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts

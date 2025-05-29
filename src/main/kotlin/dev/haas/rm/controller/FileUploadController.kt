@@ -19,6 +19,13 @@ class FileUploadController(private val resumeProcessService: ResumeProcessServic
         @RequestParam("JD") jd:String,
         @RequestParam("title") title: String,
     ): ResponseEntity<AnalysedResults> {
+        if(getResume().size>10){
+            return ResponseEntity.ok(
+                AnalysedResults(
+                    suggestions = "Cannot Analyse resumes further since this is in development stage . \n Thank you for trying \n Delete any resume before trying for other analysis",
+                )
+            )
+        }
         val uploadRequest = UploadRequest(resumeFile, jd, title)
         val result = resumeProcessService.processUploadRequest(uploadRequest)
         return ResponseEntity.ok(result)
@@ -27,5 +34,10 @@ class FileUploadController(private val resumeProcessService: ResumeProcessServic
     @GetMapping("/resume")
     fun getResume(): List<NeonModel> {
         return resumeProcessService.getResume()
+    }
+
+    @PostMapping("/delete/{id}")
+    fun deleteResume(@PathVariable id: Long){
+        return resumeProcessService.deleteResumeById(id)
     }
 }

@@ -6,5 +6,5 @@ import dev.haas.rm.model.entity.NeonModel
 
 @Repository
 interface NeonRepository : JpaRepository<NeonModel, Long> {
-    fun findAllById(id: Long): List<NeonModel>
+    fun findAllByUserID(userId: Long): List<NeonModel>
 }

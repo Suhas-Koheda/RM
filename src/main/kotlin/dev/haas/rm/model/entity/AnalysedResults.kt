@@ -12,10 +12,13 @@ data class AnalysedResults(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     
-    val match: Double,
+    val match: Double=0.0,
     
     @Column(columnDefinition = "TEXT")
     val suggestions: String = "",
-    
-    val modelUsed: String
+
+    @Column(columnDefinition = "TEXT")
+    val jD:String="",
+
+    val modelUsed: String=""
 )
