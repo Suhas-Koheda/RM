@@ -39,14 +39,92 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
                - Start with a clear action verb
                - Be wrapped in <h3> for the title and <h5> for the details
             3. The model used for analysis (your specific model name)
-            
+            4. Give me the resume in proper overleaf format like below
+                ---format 
+               \documentclass[a4paper,10pt]{article}
+
+               \usepackage{geometry}
+               \geometry{left=0.75in, right=0.75in, top=0.75in, bottom=0.5in}
+               \usepackage{enumitem}
+               \usepackage{hyperref}
+               \usepackage{titlesec}
+               \usepackage{parskip}
+               \usepackage{multicol}
+               \usepackage{sectsty}
+               \usepackage{ragged2e}
+
+               % Define a custom section format with an underline
+               \titleformat{\section}{
+                   \large\bfseries}{}{0em}{\titlerule[0.5pt]\vspace{0.5ex}}
+               \titleformat{\subsection}{
+                   \bfseries}{}{0em}{\titlerule[0.5pt]\vspace{0.5ex}}
+
+               % Compact spacing
+               \setlength{\parskip}{0.4em}
+               \setlength{\parindent}{0em}
+
+               % Add custom styles to sections
+               \sectionfont{\uppercase}
+               \subsectionfont{\underline}
+
+               \begin{document}
+
+               \begin{center}
+                   \textbf{\LARGE Your Name}\\
+                   \href{mailto:your-email@example.com}{your-email@example.com} \hspace{10pt} | \hspace{10pt} +1-234-567-8901 \hspace{10pt} | \hspace{10pt} \href{https://github.com/your-username}{github.com/your-username} \hspace{10pt} | \hspace{10pt} \href{https://your-portfolio.com}{Portfolio} \hspace{10pt} | \hspace{10pt} \href{https://linkedin.com/in/your-profile}{LinkedIn}
+               \end{center}
+
+               \section*{Education}
+               \hline
+               \textbf{University Name}, City, Country \hfill Year – Year\\
+               Degree Name — CGPA: X.X
+
+               \textbf{School Name}, City \hfill Year – Year\\
+               Board/Curriculum — Score: XX\%
+
+               \section*{Skills}
+               \hline
+               Skill 1 — Skill 2 — Skill 3 — Skill 4 — Skill 5 — Skill 6 — Skill 7 — Skill 8 — Skill 9 — Skill 10    
+
+               \section*{Open Source Contributions}
+               \hline
+               \textbf{Project Name} \hfill \textit{Technologies Used} \hfill Month Year\\
+               Brief description of contribution.
+
+               \hfill
+               \begin{flushright}
+                   \href{https://github.com/repo-link}{Code} \hspace{10pt} | \hspace{10pt} \href{https://live-demo.com}{Live Demo} (if available)
+               \end{flushright}
+
+               \section*{Projects}
+               \hline
+               \hfill
+               \textbf{Project Name} \hfill \textit{Technologies Used} \hfill Month Year\\
+               Description of project including key features and technologies.
+
+               \begin{flushright}
+                   \href{https://github.com/repo-link}{Code} \hspace{10pt} | \hspace{10pt} \href{https://live-demo.com}{Live Demo} (if available)
+               \end{flushright}
+
+               \section*{Work Experience}
+               \hline
+               \textbf{Company Name} — \textit{Position} \hfill Month Year – Present/Month Year\\
+               Description of responsibilities and achievements.
+
+               \section*{Positions of Responsibility}
+               \hline
+               \textbf{Organization Name} — \textit{Position (Month Year - Month Year), Additional Roles (Month Year - Month Year)}\\
+               Description of responsibilities and contributions.
+
+               \end{document}
+                format ---
+             
             Format your response exactly like this:
-            [match percentage]|<h3>Suggestion 1</h3><h5>Details 1</h5><h3>Suggestion 2</h3><h5>Details 2</h5>...|[model name]
+            [match percentage]|<h3>Suggestion 1</h3><h5>Details 1</h5><h3>Suggestion 2</h3><h5>Details 2</h5>...|[model name]|Resume in the overleaf format 
         """.trimIndent()
 
         return buildAnalysedResults(chatModel.chat(analyseTemplate),JD).also {
             neonRepository.save(NeonModel(
-                resume = resume,
                 analysedResults = it,
                 userID = SecurityContextHolder.getContext().authentication.principal as Long,
                 title = title
@@ -64,14 +142,16 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
                 match = splitResults[0].trim().toDouble(),
                 suggestions = splitResults[1].trim(),
                 modelUsed = splitResults[2].trim(),
-                jD=jD
+                jD=jD,
+                resume = splitResults[3].trim()
             )
         } catch (e: Exception) {
             AnalysedResults(
                 match = 0.0,
                 suggestions = "Error parsing response: ${e.message}. Original response: $results",
                 modelUsed = "unknown",
-                jD=jD
+                jD=jD,
+                resume = ""
             )
         }
     }

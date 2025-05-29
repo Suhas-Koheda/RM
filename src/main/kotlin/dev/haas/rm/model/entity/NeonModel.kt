@@ -16,9 +16,6 @@ data class NeonModel(
 
     @Column
     val title: String,
-
-    @Column(columnDefinition = "TEXT", nullable = false)
-    val resume: String,
     
     @Column(nullable = false)
     val userID: Long,

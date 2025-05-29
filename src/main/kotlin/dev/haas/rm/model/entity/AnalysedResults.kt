@@ -20,5 +20,8 @@ data class AnalysedResults(
     @Column(columnDefinition = "TEXT")
     val jD:String="",
 
-    val modelUsed: String=""
+    val modelUsed: String="",
+
+    @Column(columnDefinition = "TEXT")
+    val resume:String="",
 )
