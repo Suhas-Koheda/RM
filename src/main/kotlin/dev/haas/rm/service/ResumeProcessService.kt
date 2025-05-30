@@ -231,7 +231,7 @@ class ResumeProcessService(private val fileProcessService: FileProcessService,
 
     fun deleteResumeById(id: Long) {
         try {
-            neonRepository.deleteById(id)
+            neonRepository.deleteByIdAndUserID(id, SecurityContextHolder.getContext().authentication.principal as Long)
         } catch (e: Exception) {
             logger.severe("Error deleting resume with ID $id: ${e.message}")
             throw e

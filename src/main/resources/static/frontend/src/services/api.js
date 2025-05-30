@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : '';
+const API_URL = process.env.NODE_ENV === 'development' ? 'https://b5ea-13-233-78-31.ngrok-free.app' : '';
 const ANALYSE_URL = API_URL + '/analyse';
 const AUTH_URL = API_URL + '/auth';
 
