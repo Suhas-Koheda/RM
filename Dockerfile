@@ -1,60 +1,49 @@
-# Stage 1: Build Frontend
-# Assumes Node.js frontend in 'src/main/resources/static/frontend'
-FROM node:20-alpine AS frontend-builder
-WORKDIR /app/frontend
+# Build stage for both backend and frontend
+FROM maven:3.8.5-openjdk-17 AS build
 
-# Copy package.json and package-lock.json (if available)
-COPY src/main/resources/static/frontend/package.json ./
-# If you use package-lock.json (recommended for npm)
-# COPY src/main/resources/static/frontend/package-lock.json ./
-# If you use yarn.lock instead:
-# COPY src/main/resources/static/frontend/yarn.lock ./
+# Set working directory
+WORKDIR /build
 
-# Install dependencies
-# For npm, 'npm ci' is often preferred for reproducible builds if package-lock.json exists
-RUN npm install
-# If using yarn:
-# RUN yarn install --frozen-lockfile
-
-# Copy the rest of the frontend application code
-COPY src/main/resources/static/frontend/ ./
-
-# Build the frontend application
-# This assumes the build output is in /app/frontend/build
-RUN npm run build
-
-# Stage 2: Build Backend (Spring Boot with Maven)
-# Using a Maven image with JDK 21 as specified in pom.xml
-FROM maven:3-eclipse-temurin-21 AS backend-builder
-WORKDIR /app
-
-# Copy pom.xml
+# Copy Maven POM file and source code
 COPY pom.xml .
-
-# Copy the backend source code
 COPY src ./src
+COPY .env .
 
-# Copy built frontend assets into Spring Boot's static resources directory
-# This allows Spring Boot to serve the frontend files.
-# The frontend build output is in /app/frontend/build from the frontend-builder stage.
-# We copy its contents into /app/src/main/resources/static, which will be packaged into the JAR.
-COPY --from=frontend-builder /app/frontend/build ./src/main/resources/static
+# Build the Spring Boot application
+RUN mvn clean package -DskipTests
 
-# Build the Spring Boot application, skipping tests for faster Docker builds
-# The target JAR will be in /app/
-RUN mvn package -DskipTests
+# Final runtime image
+FROM openjdk:17-slim
 
-# Stage 3: Create Final Application Image
-# Use a JRE image for a smaller footprint, compatible with Java 21
-FROM eclipse-temurin:21-jre-alpine
+# Install Node.js and npm
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set up working directories
 WORKDIR /app
 
-# Copy the executable JAR from the backend-builder stage
-# Adjust rm-0.0.1-SNAPSHOT.jar if your artifactId or version changes in pom.xml
-COPY --from=backend-builder /app/target/rm-0.0.1-SNAPSHOT.jar app.jar
+# Copy Spring Boot JAR from build stage
+COPY --from=build /build/target/RecuritrManager-0.0.1-SNAPSHOT.jar /app/app.jar
 
-# Expose the port the application runs on (default for Spring Boot is 8080)
-EXPOSE 8080
+# Copy frontend files from build stage
+COPY --from=build /build/src/main/resources/static/frontend /app/frontend
 
-# Command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Install npm dependencies for the frontend
+WORKDIR /app/frontend
+RUN npm install
+
+# Set working directory back to /app
+WORKDIR /app
+ 
+# Expose ports (8080 for backend, 3000 for React dev server)
+EXPOSE 8080 3000
+
+# Copy startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]

@@ -40,3 +40,6 @@ src/main/resources/static/frontend/.vscode/
 .DS_Store
 .env*
 *.log
+
+# Ignore environment variable files
+.env
